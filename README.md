@@ -32,10 +32,10 @@ The desktop project targets `net10.0`. The repo pins SDK `10.0.301` in `global.j
 
 ## Linux / WSLg
 
-Photino uses WebKitGTK on Linux. On Ubuntu/WSL install:
+Photino uses WebKitGTK on Linux. On Ubuntu 22.04 / WSL install:
 
 ```bash
-sudo apt-get install libwebkit2gtk-4.1-0
+sudo apt-get install libwebkit2gtk-4.0-37
 ```
 
 Then run:

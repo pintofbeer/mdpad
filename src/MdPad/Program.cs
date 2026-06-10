@@ -20,13 +20,13 @@ public static class Program
         }
         catch (DllNotFoundException ex) when (OperatingSystem.IsLinux() && ex.Message.Contains("libwebkit2gtk", StringComparison.OrdinalIgnoreCase))
         {
-            Console.Error.WriteLine("mdpad requires WebKitGTK on Linux. Install it with: sudo apt-get install libwebkit2gtk-4.1-0");
+            Console.Error.WriteLine("mdpad requires WebKitGTK on Linux. Install it with: sudo apt-get install libwebkit2gtk-4.0-37");
             Console.Error.WriteLine(ex.Message);
             Environment.ExitCode = 1;
         }
         catch (ApplicationException ex) when (OperatingSystem.IsLinux() && ex.ToString().Contains("libwebkit2gtk", StringComparison.OrdinalIgnoreCase))
         {
-            Console.Error.WriteLine("mdpad requires WebKitGTK on Linux. Install it with: sudo apt-get install libwebkit2gtk-4.1-0");
+            Console.Error.WriteLine("mdpad requires WebKitGTK on Linux. Install it with: sudo apt-get install libwebkit2gtk-4.0-37");
             Console.Error.WriteLine(ex.Message);
             Environment.ExitCode = 1;
         }
