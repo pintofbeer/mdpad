@@ -45,6 +45,7 @@ public static class Program
         private readonly SettingsStore _settings = new();
         private PhotinoWindow? _window;
         private DialogService? _dialogs;
+        private StaticWebServer? _webServer;
 
         public void Run()
         {
@@ -71,7 +72,14 @@ public static class Program
             }
             else
             {
-                _window.Load(index);
+                _webServer = new StaticWebServer(webRoot);
+                _webServer.Start();
+                _window.RegisterWindowClosingHandler((_, _) =>
+                {
+                    _webServer.Dispose();
+                    return false;
+                });
+                _window.Load(new Uri(_webServer.BaseUri, "index.html"));
             }
 
             _window.WaitForClose();
@@ -227,5 +235,6 @@ public static class Program
         {
             return DateOnly.Parse(value);
         }
+
     }
 }

@@ -4,8 +4,8 @@ import { oneDark } from "@codemirror/theme-one-dark";
 import { icons } from "lucide";
 import "./styles.css";
 
-const bridge = createBridge();
 const app = document.querySelector("#app");
+let bridge;
 
 let state = {
   settings: { theme: "system" },
@@ -22,8 +22,18 @@ let state = {
   pendingEditorText: null,
 };
 
-renderShell();
-boot();
+start();
+
+function start() {
+  showBoot("Starting mdpad...");
+  try {
+    bridge = createBridge();
+    renderShell();
+    boot().catch(showFatal);
+  } catch (error) {
+    showFatal(error);
+  }
+}
 
 async function boot() {
   const init = await bridge.send("init");
@@ -46,18 +56,29 @@ function createBridge() {
     message.ok ? resolver.resolve(message.data) : resolver.reject(new Error(message.error));
   };
 
-  window.chrome?.webview?.addEventListener("message", (event) => receive(event.data));
-  window.external?.receiveMessage?.(receive);
+  try {
+    if (window.chrome?.webview) {
+      window.chrome.webview.addEventListener("message", (event) => receive(event.data));
+    }
+
+    if (window.external && typeof window.external.receiveMessage === "function") {
+      window.external.receiveMessage(receive);
+    }
+  } catch (error) {
+    throw new Error(`Could not register desktop bridge: ${error.message}`);
+  }
 
   return {
     send(type, payload = {}) {
-      if (!window.chrome?.webview && !window.external?.sendMessage) {
+      const canUseWebView2 = Boolean(window.chrome?.webview);
+      const canUsePhotino = Boolean(window.external && typeof window.external.sendMessage === "function");
+      if (!canUseWebView2 && !canUsePhotino) {
         return Promise.reject(new Error("mdpad must run inside the desktop shell."));
       }
 
       const id = String(nextId++);
       const message = { id, type, payload };
-      if (window.chrome?.webview) {
+      if (canUseWebView2) {
         window.chrome.webview.postMessage(message);
       } else {
         window.external.sendMessage(JSON.stringify(message));
@@ -65,6 +86,27 @@ function createBridge() {
       return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
     },
   };
+}
+
+function showBoot(message) {
+  app.innerHTML = `
+    <div style="display:grid;place-items:center;height:100vh;font:14px Segoe UI,system-ui,sans-serif;color:#3b4452;background:#f7f8fa">
+      <div>${escapeHtml(message)}</div>
+    </div>
+  `;
+}
+
+function showFatal(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  app.innerHTML = `
+    <div style="display:grid;place-items:center;height:100vh;padding:24px;font:14px Segoe UI,system-ui,sans-serif;color:#171a1f;background:#f7f8fa">
+      <div style="max-width:720px;border:1px solid #d7dce3;background:white;border-radius:8px;padding:18px;box-shadow:0 1px 2px rgba(16,24,40,.08)">
+        <h1 style="margin:0 0 8px;font-size:18px">mdpad could not start</h1>
+        <pre style="white-space:pre-wrap;margin:0;color:#b42318">${escapeHtml(message)}</pre>
+      </div>
+    </div>
+  `;
+  console.error(error);
 }
 
 function renderShell() {
@@ -465,7 +507,22 @@ function parseTags(value) {
 
 function icon(name) {
   const pascalName = name.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("");
-  return icons[pascalName]?.toSvg({ width: 16, height: 16, "stroke-width": 2 }) ?? "";
+  const iconNode = icons[pascalName];
+  if (!iconNode) return "";
+  return renderIconNode(withIconAttrs(iconNode, { width: 16, height: 16, "stroke-width": 2 }));
+}
+
+function withIconAttrs(iconNode, attrs) {
+  const [tag, nodeAttrs, ...children] = iconNode;
+  return [tag, { ...nodeAttrs, ...attrs }, ...children];
+}
+
+function renderIconNode(node) {
+  const [tag, attrs = {}, ...children] = node;
+  const attrText = Object.entries(attrs)
+    .map(([key, value]) => `${key}="${escapeHtml(value)}"`)
+    .join(" ");
+  return `<${tag}${attrText ? ` ${attrText}` : ""}>${children.map(renderIconNode).join("")}</${tag}>`;
 }
 
 function debounce(fn, ms) {
