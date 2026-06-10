@@ -1,0 +1,383 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f7f8fa;
+  --panel: #ffffff;
+  --panel-2: #eef1f5;
+  --text: #171a1f;
+  --muted: #667085;
+  --border: #d7dce3;
+  --accent: #2563eb;
+  --accent-soft: #dbeafe;
+  --danger: #b42318;
+  --shadow: 0 1px 2px rgba(16, 24, 40, 0.08);
+  font-family: "Segoe UI", system-ui, sans-serif;
+}
+
+:root[data-theme="dark"] {
+  --bg: #111318;
+  --panel: #191d24;
+  --panel-2: #242a33;
+  --text: #edf0f3;
+  --muted: #9aa4b2;
+  --border: #353d49;
+  --accent: #60a5fa;
+  --accent-soft: #1e3a5f;
+  --danger: #f97066;
+  --shadow: none;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  overflow: hidden;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+button {
+  color: inherit;
+}
+
+#app {
+  display: grid;
+  grid-template-columns: 330px minmax(0, 1fr);
+  height: 100vh;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 14px;
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.brand-mark {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: white;
+  font-weight: 700;
+}
+
+.brand-name {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.brand-subtitle,
+.note-date,
+.note-preview,
+.file-state {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.search-row {
+  position: relative;
+}
+
+.search-row input {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px 0 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  color: var(--text);
+  outline: none;
+}
+
+.search-row input:focus,
+.title-input:focus,
+.date-input:focus,
+.tags-input:focus,
+select:focus {
+  border-color: var(--accent);
+}
+
+.search-icon {
+  position: absolute;
+  top: 10px;
+  left: 11px;
+  color: var(--muted);
+}
+
+.quick-actions,
+.sidebar-tabs,
+.toolbar-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.quick-actions button,
+.sidebar-tabs button,
+.icon-button,
+.tab,
+.date-row,
+.note-row,
+.tag-pill {
+  border: 1px solid var(--border);
+  background: var(--panel);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.quick-actions button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  flex: 1;
+  height: 34px;
+}
+
+.sidebar-tabs button {
+  flex: 1;
+  height: 32px;
+  color: var(--muted);
+}
+
+.sidebar-tabs button.active,
+.date-row.active,
+.note-row.active,
+.tag-pill.active,
+.tab.active {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.sidebar-content {
+  min-height: 0;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.section-title {
+  margin: 4px 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.date-list,
+.note-list,
+.tag-cloud {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.date-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 34px;
+  padding: 0 10px;
+}
+
+.note-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 2px;
+  width: 100%;
+  min-height: 66px;
+  padding: 8px 10px;
+  text-align: left;
+}
+
+.note-title {
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.note-preview {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tag-cloud {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+}
+
+.tag-pill {
+  min-height: 30px;
+  padding: 0 9px;
+}
+
+.empty-state {
+  padding: 16px 8px;
+  color: var(--muted);
+}
+
+.workspace {
+  display: grid;
+  grid-template-rows: 48px 54px minmax(0, 1fr);
+  min-width: 0;
+}
+
+.toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+}
+
+.tabbar {
+  display: flex;
+  min-width: 0;
+  overflow-x: auto;
+  gap: 7px;
+}
+
+.tab {
+  display: inline-grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, auto);
+  align-items: center;
+  gap: 7px;
+  max-width: 210px;
+  min-width: 96px;
+  height: 32px;
+  padding: 0 8px 0 10px;
+  box-shadow: var(--shadow);
+}
+
+.tab span:first-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab-close {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  color: var(--muted);
+}
+
+.tab-close:hover {
+  color: var(--danger);
+  background: var(--panel);
+}
+
+.icon-button {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 32px;
+}
+
+select {
+  height: 32px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+}
+
+.meta {
+  display: grid;
+  grid-template-columns: minmax(180px, 1fr) 150px minmax(160px, 280px) minmax(160px, auto);
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.title-input,
+.date-input,
+.tags-input {
+  width: 100%;
+  height: 34px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel);
+  color: var(--text);
+  padding: 0 10px;
+  outline: none;
+}
+
+.title-input {
+  font-weight: 700;
+}
+
+.file-state {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.editor-host {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.cm-editor {
+  height: 100%;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 15px;
+}
+
+.cm-scroller {
+  font-family: "Cascadia Mono", "Consolas", monospace;
+  line-height: 1.55;
+}
+
+.cm-content {
+  padding: 18px 24px;
+}
+
+@media (max-width: 940px) {
+  #app {
+    grid-template-columns: 280px minmax(0, 1fr);
+  }
+
+  .meta {
+    grid-template-columns: minmax(140px, 1fr) 132px;
+  }
+
+  .tags-input,
+  .file-state {
+    grid-column: span 2;
+  }
+}
