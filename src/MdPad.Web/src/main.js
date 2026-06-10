@@ -164,6 +164,7 @@ function renderShell() {
   document.querySelector("#openFileBtn").addEventListener("click", openFile);
   document.querySelector("#saveBtn").addEventListener("click", saveFile);
   document.querySelector("#saveAsBtn").addEventListener("click", saveAs);
+  document.querySelector("#themeSelect").addEventListener("input", setTheme);
   document.querySelector("#themeSelect").addEventListener("change", setTheme);
   document.querySelector("#titleInput").addEventListener("change", saveMetadata);
   document.querySelector("#dateInput").addEventListener("change", saveMetadata);
@@ -339,11 +340,19 @@ async function onSearch(event) {
 }
 
 async function setTheme(event) {
-  state.settings = await bridge.send("setTheme", { theme: event.target.value });
+  const theme = event.target.value;
+  state.settings = { theme };
   applyTheme();
+  renderTabsAndMeta();
   const tab = getActiveTab();
   if (tab) mountEditor({ ...tab, content: state.editor?.state.doc.toString() ?? tab.content });
-  render();
+  try {
+    state.settings = await bridge.send("setTheme", { theme });
+  } catch (error) {
+    showFatal(error);
+    return;
+  }
+  document.querySelector("#themeSelect").value = state.settings.theme;
 }
 
 function replaceTab(note) {
@@ -493,7 +502,9 @@ function getActiveTab() {
 }
 
 function applyTheme() {
-  document.documentElement.dataset.theme = isDark() ? "dark" : "light";
+  const theme = isDark() ? "dark" : "light";
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme;
 }
 
 function isDark() {
