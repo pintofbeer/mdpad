@@ -1,31 +1,37 @@
-using Microsoft.Win32;
+using Photino.NET;
 
 namespace MdPad.Services;
 
 public sealed class DialogService
 {
-    public string? PickOpenFile()
-    {
-        var dialog = new OpenFileDialog
-        {
-            Title = "Open in mdpad",
-            Filter = "Text and Markdown|*.txt;*.md;*.markdown|All files|*.*",
-            CheckFileExists = true
-        };
+    private static readonly (string Name, string[] Extensions)[] TextFilters =
+    [
+        ("Text and Markdown", ["*.txt", "*.md", "*.markdown"]),
+        ("All files", ["*.*"])
+    ];
 
-        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    private static readonly (string Name, string[] Extensions)[] SaveFilters =
+    [
+        ("Markdown", ["*.md"]),
+        ("Text", ["*.txt"]),
+        ("All files", ["*.*"])
+    ];
+
+    private readonly PhotinoWindow _window;
+
+    public DialogService(PhotinoWindow window)
+    {
+        _window = window;
     }
 
-    public string? PickSaveFile(string suggestedName)
+    public async Task<string?> PickOpenFileAsync()
     {
-        var dialog = new SaveFileDialog
-        {
-            Title = "Save as",
-            FileName = suggestedName,
-            Filter = "Markdown|*.md|Text|*.txt|All files|*.*",
-            OverwritePrompt = true
-        };
+        var paths = await _window.ShowOpenFileAsync("Open in mdpad", "", false, TextFilters);
+        return paths.FirstOrDefault();
+    }
 
-        return dialog.ShowDialog() == true ? dialog.FileName : null;
+    public async Task<string?> PickSaveFileAsync(string suggestedName)
+    {
+        return await _window.ShowSaveFileAsync("Save as", suggestedName, SaveFilters);
     }
 }

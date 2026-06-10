@@ -38,22 +38,30 @@ function createBridge() {
   let nextId = 1;
   const pending = new Map();
 
-  window.chrome?.webview?.addEventListener("message", (event) => {
-    const message = event.data;
+  const receive = (raw) => {
+    const message = typeof raw === "string" ? JSON.parse(raw) : raw;
     const resolver = pending.get(message.id);
     if (!resolver) return;
     pending.delete(message.id);
     message.ok ? resolver.resolve(message.data) : resolver.reject(new Error(message.error));
-  });
+  };
+
+  window.chrome?.webview?.addEventListener("message", (event) => receive(event.data));
+  window.external?.receiveMessage?.(receive);
 
   return {
     send(type, payload = {}) {
-      if (!window.chrome?.webview) {
+      if (!window.chrome?.webview && !window.external?.sendMessage) {
         return Promise.reject(new Error("mdpad must run inside the desktop shell."));
       }
 
       const id = String(nextId++);
-      window.chrome.webview.postMessage({ id, type, payload });
+      const message = { id, type, payload };
+      if (window.chrome?.webview) {
+        window.chrome.webview.postMessage(message);
+      } else {
+        window.external.sendMessage(JSON.stringify(message));
+      }
       return new Promise((resolve, reject) => pending.set(id, { resolve, reject }));
     },
   };
@@ -456,7 +464,8 @@ function parseTags(value) {
 }
 
 function icon(name) {
-  return icons[name]?.toSvg({ width: 16, height: 16, "stroke-width": 2 }) ?? "";
+  const pascalName = name.split("-").map((part) => part.charAt(0).toUpperCase() + part.slice(1)).join("");
+  return icons[pascalName]?.toSvg({ width: 16, height: 16, "stroke-width": 2 }) ?? "";
 }
 
 function debounce(fn, ms) {

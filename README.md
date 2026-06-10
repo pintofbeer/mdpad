@@ -4,7 +4,7 @@ mdpad is a Windows Notepad-style markdown editor that stores notes in SQLite fir
 
 ## Features
 
-- WPF desktop shell with WebView2.
+- Cross-platform Photino desktop shell: WebView2 on Windows and WebKitGTK on Linux.
 - CodeMirror 6 editor with `@codemirror/lang-markdown`.
 - SQLite note store in `%LOCALAPPDATA%\mdpad\mdpad.db`.
 - Daily note organization with an automatic `scratch` tab for each day.
@@ -28,4 +28,22 @@ dotnet restore
 dotnet build
 ```
 
-The desktop project targets `net6.0-windows10.0.19041.0` and is intended to run on Windows with the WebView2 runtime installed.
+The desktop project targets `net10.0`. The repo pins SDK `10.0.301` in `global.json`.
+
+## Linux / WSLg
+
+Photino uses WebKitGTK on Linux. On Ubuntu/WSL install:
+
+```bash
+sudo apt-get install libwebkit2gtk-4.1-0
+```
+
+Then run:
+
+```bash
+dotnet run --project src/MdPad/MdPad.csproj
+```
+
+## Windows
+
+On Windows the same project uses WebView2. Install the .NET 10 SDK and the WebView2 runtime, then build and run from the repo root.
